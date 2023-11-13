@@ -1,5 +1,33 @@
 #include "trojanmap.h"
 
+// ==============================
+// Helper Function
+// ==============================
+bool IsPrefixMatched(const std::string& prefix, const std::string& target)
+{
+
+  // check only if prefix is provided && prefix.size <= target
+  if(!prefix.empty() && prefix.length()<= target.length())
+  {
+    // compare prefix with target  (not case sensitive)
+    for(int i=0; i<prefix.size(); i++)
+    {
+      if(std::tolower(prefix[i]) != std::tolower(target[i]))
+        return false;
+    }
+
+    // if prefix is matched, return true
+    return true;
+  } 
+
+  // invalid prefix is provided
+  else  
+    return false;
+}
+
+
+
+
 //-----------------------------------------------------
 // TODO: Students should implement the following:
 //-----------------------------------------------------
@@ -103,6 +131,15 @@ std::string TrojanMap::FindClosestName(std::string name) {
  */
 std::vector<std::string> TrojanMap::Autocomplete(std::string name) {
   std::vector<std::string> results;
+
+  // TODO: loop through the map data to find all possible location names with matched prefix
+  for(const auto& tmp : data)
+  {
+    // 1. a location must has a name;  2. location's prefix must be matched with <name>
+    const std::string& location = tmp.second.name;
+    if(!location.empty() && IsPrefixMatched(name, location))
+      results.push_back(location);
+  }
   return results;
 }
 
