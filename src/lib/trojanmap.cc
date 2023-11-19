@@ -26,8 +26,6 @@ bool IsPrefixMatched(const std::string& prefix, const std::string& target)
 }
 
 
-
-
 //-----------------------------------------------------
 // TODO: Students should implement the following:
 //-----------------------------------------------------
@@ -142,8 +140,29 @@ std::pair<double, double> TrojanMap::GetPosition(std::string name) {
  * @param  {std::string} b          : second string
  * @return {int}                    : edit distance between two strings
  */
-int TrojanMap::CalculateEditDistance(std::string a, std::string b) {     
-  return 0;
+int TrojanMap::CalculateEditDistance(std::string a, std::string b) {    
+    // TODO:  should be case insensitive 
+    int a_sz = a.length();
+    int b_sz = b.length();
+    std::vector<std::vector<int>> dp(a_sz + 1, std::vector<int>(b_sz + 1));
+
+    for (int i = 0; i <= a_sz; i++) {
+        for (int j = 0; j <= b_sz; j++) {
+            if (i == 0) {
+                dp[i][j] = j;  // Min. operations = j
+            } else if (j == 0) {
+                dp[i][j] = i;   // Min. operations = i
+            } else if (a[i - 1] == b[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];  // No operation needed
+            } else {
+                dp[i][j] = 1 + std::min({dp[i - 1][j],    // Delete
+                                         dp[i][j - 1],    // Insert
+                                         dp[i - 1][j - 1] // Replace
+                                        });
+            }
+        }
+    }
+    return dp[a_sz][b_sz];
 }
 
 /**
@@ -154,8 +173,23 @@ int TrojanMap::CalculateEditDistance(std::string a, std::string b) {
  * @return {std::string} tmp           : the closest name
  */
 std::string TrojanMap::FindClosestName(std::string name) {
-  std::string tmp = ""; // Start with a dummy word
-  return tmp;
+    std::string tmp = ""; // tmp should always hold the string with minimum edit distance
+    int prevEditDist = CalculateEditDistance(tmp, name);
+    int currEditDist;
+    for(auto entry : data){
+        const std::string& nodeName = entry.second.name;
+        if(!nodeName.empty())
+        {
+            currEditDist = CalculateEditDistance(nodeName, name);
+
+            if(currEditDist < prevEditDist)
+            {
+                tmp = nodeName;
+                prevEditDist = currEditDist;
+            }
+        }
+    }
+    return tmp;
 }
 
 /**
@@ -186,7 +220,13 @@ std::vector<std::string> TrojanMap::Autocomplete(std::string name) {
  * @return {std::vector<std::string>}  : all unique location categories
  */
 std::vector<std::string> TrojanMap::GetAllCategories() {
-  return {};
+    std::set<std::string> unique_Cats;
+    for(auto& ptr : data){
+        for(auto category : ptr.second.attributes){
+            unique_Cats.insert(category);
+        }
+    }
+    return std::vector<std::string>(unique_Cats.begin(), unique_Cats.end());
 }
 
 /**
@@ -199,8 +239,25 @@ std::vector<std::string> TrojanMap::GetAllCategories() {
  */
 std::vector<std::string> TrojanMap::GetAllLocationsFromCategory(
     std::string category) {
-  std::vector<std::string> res;
-  return res;
+    std::vector<std::string> res;
+    
+    for(auto& ptr : data){
+        auto& attrSet = ptr.second.attributes;
+        if(!attrSet.empty())
+        {
+            auto iter = attrSet.find(category);
+            if(iter != attrSet.end()){
+                res.push_back(ptr.second.id);
+            }
+        }
+    }
+
+    if(res.empty()){
+        res.push_back("-1");
+        res.push_back("-1");
+    }
+
+    return res;
 }
 
 /**
@@ -213,7 +270,19 @@ std::vector<std::string> TrojanMap::GetAllLocationsFromCategory(
  * @return {std::vector<std::string>}     : ids
  */
 std::vector<std::string> TrojanMap::GetLocationRegex(std::regex location) {
-  return {};
+    
+    std::vector<std::string> res;
+    
+    // if invalid regex or if no match
+    for(auto& node : data)
+    {
+        const std::string& name = node.second.name;
+        if(std::regex_match(name ,location)){
+            res.push_back(node.first);
+        }
+    }
+
+    return res;
 }
 
 /**
