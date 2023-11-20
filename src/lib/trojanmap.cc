@@ -25,6 +25,49 @@ bool IsPrefixMatched(const std::string& prefix, const std::string& target)
     return false;
 }
 
+// Dijkstra Algorithm to find the destination id2
+bool TrojanMap::DijkstraFound(std::priority_queue<std::pair<double, std::string>,
+            std::vector<std::pair<double, std::string>>,
+            std::greater<std::pair<double, std::string>>>& q,
+            std::unordered_map<std::string,
+            std::pair<bool, std::pair< double, std::string >>>& mark,
+            std::string id2){
+
+  // get the shortest edge <distance, id>
+  std::pair<double, std::string> current = q.top();
+
+    // destination found
+    if(current.second == id2){
+      return true;
+    }
+
+    q.pop();
+    mark[current.second].first = true;
+
+    // update distance
+    std::vector<std::string> current_neighbors = data[current.second].neighbors;
+    for(auto i : current_neighbors){
+      double temp_distance = current.first + CalculateDistance(current.second, i);
+      // update previously unvisited node
+      if(mark.find(i) == mark.end()){
+        q.push(std::pair<double, std::string>(temp_distance, i));
+        mark.insert(std::pair< std::string, std::pair< bool, std::pair<double, std::string> > >
+              (i, std::pair< bool, std::pair<double, std::string> >(false, std::pair<double, std::string>(temp_distance, current.second))));
+      }
+      // update visited node if distance becomes shorter
+      else if(mark[i].second.first > temp_distance){
+        mark[i].second.first = temp_distance;
+        mark[i].second.second = current.second;
+        q.push(std::pair<double, std::string>(temp_distance, i));
+      }
+    }
+
+    //remove unwanted tops
+    while(!q.empty() && mark[q.top().second].first)
+      q.pop();
+    return false;
+}
+
 
 //-----------------------------------------------------
 // TODO: Students should implement the following:
@@ -240,7 +283,7 @@ std::vector<std::string> TrojanMap::GetAllCategories() {
 std::vector<std::string> TrojanMap::GetAllLocationsFromCategory(
     std::string category) {
     std::vector<std::string> res;
-    
+
     for(auto& ptr : data){
         auto& attrSet = ptr.second.attributes;
         if(!attrSet.empty())
@@ -270,9 +313,9 @@ std::vector<std::string> TrojanMap::GetAllLocationsFromCategory(
  * @return {std::vector<std::string>}     : ids
  */
 std::vector<std::string> TrojanMap::GetLocationRegex(std::regex location) {
-    
+
     std::vector<std::string> res;
-    
+
     // if invalid regex or if no match
     for(auto& node : data)
     {
@@ -292,7 +335,7 @@ std::vector<std::string> TrojanMap::GetLocationRegex(std::regex location) {
  * The distance is in mile.
  * The distance is calculated using the Haversine formula.
  * https://en.wikipedia.org/wiki/Haversine_formula
- * 
+ *
  * @param  {std::string} a  : a_id
  * @param  {std::string} b  : b_id
  * @return {double}  : distance in mile
@@ -315,7 +358,7 @@ double TrojanMap::CalculateDistance(const std::string &a_id,
  * CalculatePathLength: Calculates the total path length for the locations
  * inside the vector.
  * We have provided the code for you. Please do not need to change this function.
- * 
+ *
  * @param  {std::vector<std::string>} path : path
  * @return {double}                        : path length
  */
@@ -338,7 +381,40 @@ double TrojanMap::CalculatePathLength(const std::vector<std::string> &path) {
  */
 std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
     std::string location1_name, std::string location2_name) {
-  std::vector<std::string> path;
+  std::vector<std::string> path;        //the return vector
+  std::string id1 = GetID(location1_name);
+  std::string id2 = GetID(location2_name);
+
+  //priority_queue: pair(distance, id)
+  std::priority_queue< std::pair<double, std::string>, std::vector< std::pair<double, std::string>>,
+    std::greater<std::pair<double, std::string>>> q;
+
+  //< id, < visited, < distance, last >>>
+  std::unordered_map< std::string, std::pair< bool, std::pair< double, std::string >>> mark;
+
+  //insert the source node
+  q.push(std::pair<double, std::string>(0, id1));
+  mark.insert(std::pair< std::string, std::pair< bool, std::pair<double, std::string>>>
+            (id1, std::pair< bool, std::pair<double, std::string> >(false, std::pair<double, std::string>(0, "0"))));
+
+  // run Dijkstra Algorithm to find the path
+  while(!q.empty()){
+    if (DijkstraFound(q, mark, id2))
+      break;
+  }
+
+  // not found
+  if(q.empty())
+    return path;
+  // build the path
+  std::string temp = q.top().second;
+  while(temp != id1)
+  {
+    path.push_back(temp);
+    temp = mark[temp].second.second;
+  }
+  path.push_back(temp);
+  reverse(path.begin(), path.end());
   return path;
 }
 
@@ -353,7 +429,52 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
  */
 std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(
     std::string location1_name, std::string location2_name) {
+  std::string id1 = GetID(location1_name);
+  std::string id2 = GetID(location2_name);
+
+  //1D method in lec8 slides
+  std::unordered_map<std::string, double> distances;    // map for updating distances
+  std::unordered_map<std::string, std::string> lasts;   //map for the last
+
+  //initialize
+  for(auto i : data){
+    distances.insert(std::pair<std::string, double>(i.first, INT_MAX));
+    lasts.insert(std::pair<std::string, std::string>(i.first, ""));
+  }
+  distances[id1] = 0;
+
+  for (int i = 0; i < data.size() - 1; i++){
+    bool flag = false;  // flag for updating
+    for (auto v : data){
+      std::string cur = v.first;
+      if(distances[cur]==INT_MAX)
+        continue;
+      for(auto neighbor : v.second.neighbors){
+        // update distance for neighbours
+        double newdistance = distances[cur] + CalculateDistance(neighbor, cur);
+        if(distances[neighbor] > newdistance){
+          distances[neighbor] = newdistance;
+          lasts[neighbor] = cur;
+          flag = true;
+        }
+      }
+    }
+    //if no changes
+    if(!flag)
+      break;
+  }
+
+  // build the path
   std::vector<std::string> path;
+  path.push_back(id2);
+  std::string temp = lasts[id2];
+  while(temp != id1){
+    path.push_back(temp);
+    temp = lasts[temp];
+  }
+  path.push_back(id1);
+  reverse(path.begin(), path.end());
+
   return path;
 }
 
