@@ -1,0 +1,46 @@
+Source, Destination
+Little Caesars,Grand/LATTC
+Grand/LATTC,Chevron 2
+Chevron 2,Ralphs
+Ralphs,Food Mart
+Food Mart,Chick-fil-A
+Chick-fil-A,USC Village Gym
+USC Village Gym,KFC
+KFC,Popeyes
+Popeyes,Lotus Temple
+Little Caesars,Chevron 2
+Little Caesars,Ralphs
+Little Caesars,Food Mart
+Little Caesars,Chick-fil-A
+Little Caesars,USC Village Gym
+Little Caesars,KFC
+Little Caesars,Popeyes
+Little Caesars,Lotus Temple
+Grand/LATTC,Ralphs
+Grand/LATTC,Food Mart
+Grand/LATTC,Chick-fil-A
+Grand/LATTC,USC Village Gym
+Grand/LATTC,KFC
+Grand/LATTC,Popeyes
+Grand/LATTC,Lotus Temple
+Chevron 2,Food Mart
+Chevron 2,Chick-fil-A
+Chevron 2,USC Village Gym
+Chevron 2,KFC
+Chevron 2,Popeyes
+Chevron 2,Lotus Temple
+Ralphs,Chick-fil-A
+Ralphs,USC Village Gym
+Ralphs,KFC
+Ralphs,Popeyes
+Ralphs,Lotus Temple
+Food Mart,USC Village Gym
+Food Mart,KFC
+Food Mart,Popeyes
+Food Mart,Lotus Temple
+Chick-fil-A,KFC
+Chick-fil-A,Popeyes
+Chick-fil-A,Lotus Temple
+USC Village Gym,Popeyes
+USC Village Gym,Lotus Temple
+KFC,Lotus Temple
