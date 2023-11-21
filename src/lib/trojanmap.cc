@@ -68,6 +68,37 @@ bool TrojanMap::DijkstraFound(std::priority_queue<std::pair<double, std::string>
     return false;
 }
 
+bool dfsCycle(  std::string currId, std::string parentId, 
+                std::unordered_map<std::string, Node>& data, std::vector<std::string>& subgraph,
+                std::unordered_set<std::string>& visited, std::stack<std::string>& path)
+{
+    // curr node has been visited before, a cycle is detected
+    if(visited.find(currId) != visited.end())
+        return true;
+
+    // 1.current node has not been visited, continue dfs the neighbor of current node
+    // 2.record the path
+    visited.insert(currId);
+    path.push(currId);
+
+    for(const std::string& neighborId : data[currId].neighbors)
+    {
+        bool isInSubgraph = std::find(subgraph.begin(), subgraph.end(), neighborId) != subgraph.end();
+        bool isNotParentNode = neighborId != parentId;
+
+        if(isNotParentNode && isInSubgraph){
+            // if a sub-path contains a path, return immediately
+            if(dfsCycle(neighborId, currId, data, subgraph, visited, path))
+            {
+                return true;
+            }
+        }
+    }
+
+    // no cycle is detected, all path has been visited, erase the path
+    path.pop();
+    return false;
+}
 
 //-----------------------------------------------------
 // TODO: Students should implement the following:
@@ -598,14 +629,19 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(
 }
 
 /**
- * inSquare: Give a id retunr whether it is in square or not.
+ * inSquare: Give a id return whether it is in square or not.
  *
  * @param  {std::string} id            : location id
  * @param  {std::vector<double>} square: four vertexes of the square area
  * @return {bool}                      : in square or not
  */
 bool TrojanMap::inSquare(std::string id, std::vector<double> &square) {
-  return true;
+    // square = {longitude_left, longitude_right, latitude_upper, latitude_lower}
+    bool res;
+    double lat = GetLat(id);
+    double lon = GetLon(id);
+    res = (lon >= square[0] && lon < square[1]) && (lat >= square[3] && lat <= square[2]);
+    return res;
 }
 
 
@@ -619,9 +655,15 @@ bool TrojanMap::inSquare(std::string id, std::vector<double> &square) {
  * square
  */
 std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square) {
-  // include all the nodes in subgraph
-  std::vector<std::string> subgraph;
-  return subgraph;
+    // include all the nodes in subgraph
+    std::vector<std::string> subgraph;
+    for(auto& pair : data)
+    {
+        const std::string& id = pair.first;
+        if(inSquare(id, square))
+            subgraph.push_back(id);
+    }
+    return subgraph;
 }
 
 /**
@@ -634,7 +676,13 @@ std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square) {
  * @return {bool}: whether there is a cycle or not
  */
 bool TrojanMap::CycleDetection(std::vector<std::string> &subgraph, std::vector<double> &square) {
-  return false;
+
+    bool res;
+    std::unordered_set<std::string> visited;
+    std::stack<std::string> cyclePathToReport;
+    res = dfsCycle(subgraph[0], subgraph[0], data, subgraph, visited, cyclePathToReport);
+
+    return res;
 }
 
 /**
