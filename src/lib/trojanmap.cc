@@ -621,11 +621,32 @@ std::vector<std::vector<std::string>> TrojanMap::ReadDependenciesFromCSVFile(
  * @param  {std::vector<std::vector<std::string>>} dependencies     : prerequisites
  * @return {std::vector<std::string>} results                       : results
  */
-std::vector<std::string> TrojanMap::DeliveringTrojan(
-    std::vector<std::string> &locations,
-    std::vector<std::vector<std::string>> &dependencies) {
-  std::vector<std::string> result;
-  return result;     
+std::vector<std::string> TrojanMap::DeliveringTrojan(   std::vector<std::string> &locations,
+                                                        std::vector<std::vector<std::string>> &dependencies) {
+    std::vector<std::string> result;
+    std::map<std::string, int> priorityList;
+
+    // initialize list, each location initially get priority of 0
+    for(auto& loc : locations)
+        priorityList[loc] = 0;
+    
+    // for each dependency pair (location1, location2), the location1 should be visited prior to locaiton2
+    for(auto& depPair : dependencies){
+        std::string& first = depPair[0];
+        priorityList[first] ++;
+    }
+
+    // sort the node
+    std::vector<std::pair<std::string, int>> tmp(priorityList.begin(), priorityList.end());
+    auto sortAlgorithm = [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+        return a.second > b.second;
+    };
+    
+    std::sort(tmp.begin(), tmp.end(), sortAlgorithm);
+
+    for(auto& loc : tmp)
+        result.push_back(loc.first);
+    return result;     
 }
 
 /**
