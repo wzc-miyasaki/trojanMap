@@ -100,6 +100,25 @@ bool dfsCycle(  std::string currId, std::string parentId,
     return false;
 }
 
+// simply generate all possible combinations
+void Permutation_BruteForce(std::vector<std::vector<std::string>>& allPaths, std::vector<std::string> path, int st, int ed)
+{
+    // a complete permutation is found, store it to allPath
+    if(st == ed)
+    {
+        path.push_back(*path.begin());
+        allPaths.push_back(path);
+    }
+    
+    for(int curr=st; curr < ed; curr++)
+    {
+        std::swap(path[st], path[curr]);
+        Permutation_BruteForce(allPaths, path, st+1, ed);
+    }
+}
+
+
+
 //-----------------------------------------------------
 // TODO: Students should implement the following:
 //-----------------------------------------------------
@@ -524,8 +543,39 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(
 // Please use brute force to implement this function, ie. find all the permutations.
 std::pair<double, std::vector<std::vector<std::string>>> TrojanMap::TravelingTrojan_Brute_force(
                                     std::vector<std::string> location_ids) {
-  std::pair<double, std::vector<std::vector<std::string>>> records;
-  return records;
+    std::pair<double, std::vector<std::vector<std::string>>> records;
+  
+    std::map<std::string, int> visited;  
+    std::vector<std::vector<std::string>> allPaths;
+
+    // Find all permutations 
+    Permutation_BruteForce(allPaths, location_ids, 0, location_ids.size());
+    
+    // sort all permutations
+    if(!allPaths.empty())
+    {
+        
+        using PathWithLength = std::pair<double, std::vector<std::string>>;
+        auto comparator = [](const PathWithLength& a, const PathWithLength& b) {
+            return a.first < b.first; // Max-heap: longer paths have higher priority
+        };
+        std::priority_queue<PathWithLength, std::vector<PathWithLength>, decltype(comparator)> pq(comparator);
+        for(auto& path : allPaths)
+        {
+            double pathDis = CalculatePathLength(path);
+            pq.push({pathDis, path});
+            if(pq.size() > 25)
+                pq.pop();
+        }
+        // convert max Heap to sorted vector. 
+        while (!pq.empty()) {
+            records.first = pq.top().first;    
+            records.second.push_back(pq.top().second);
+            pq.pop();
+        } 
+    }
+    
+    return records;
 }
 
 // Please use backtracking to implement this function
