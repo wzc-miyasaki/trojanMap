@@ -31,7 +31,8 @@ bool TrojanMap::DijkstraFound(std::priority_queue<std::pair<double, std::string>
             std::greater<std::pair<double, std::string>>>& q,
             std::unordered_map<std::string,
             std::pair<bool, std::pair< double, std::string >>>& mark,
-            std::string id2){
+            std::string id2,
+            double tank_capacity){
 
   // get the shortest edge <distance, id>
   std::pair<double, std::string> current = q.top();
@@ -47,19 +48,25 @@ bool TrojanMap::DijkstraFound(std::priority_queue<std::pair<double, std::string>
     // update distance
     std::vector<std::string> current_neighbors = data[current.second].neighbors;
     for(auto i : current_neighbors){
-      double temp_distance = current.first + CalculateDistance(current.second, i);
-      // update previously unvisited node
-      if(mark.find(i) == mark.end()){
-        q.push(std::pair<double, std::string>(temp_distance, i));
-        mark.insert(std::pair< std::string, std::pair< bool, std::pair<double, std::string> > >
-              (i, std::pair< bool, std::pair<double, std::string> >(false, std::pair<double, std::string>(temp_distance, current.second))));
+      double neighbor_distance = CalculateDistance(current.second, i);
+      if (neighbor_distance <= tank_capacity){
+        double temp_distance = current.first + neighbor_distance;
+
+        // update previously unvisited node
+        if(mark.find(i) == mark.end()){
+          q.push(std::pair<double, std::string>(temp_distance, i));
+          mark.insert(std::pair< std::string, std::pair< bool, std::pair<double, std::string> > >
+                (i, std::pair< bool, std::pair<double, std::string> >(false, std::pair<double, std::string>(temp_distance, current.second))));
+        }
+        // update visited node if distance becomes shorter
+        else if(mark[i].second.first > temp_distance){
+          mark[i].second.first = temp_distance;
+          mark[i].second.second = current.second;
+          q.push(std::pair<double, std::string>(temp_distance, i));
+        }
       }
-      // update visited node if distance becomes shorter
-      else if(mark[i].second.first > temp_distance){
-        mark[i].second.first = temp_distance;
-        mark[i].second.second = current.second;
-        q.push(std::pair<double, std::string>(temp_distance, i));
-      }
+
+
     }
 
     //remove unwanted tops
@@ -459,7 +466,7 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
 
   // run Dijkstra Algorithm to find the path
   while(!q.empty()){
-    if (DijkstraFound(q, mark, id2))
+    if (DijkstraFound(q, mark, id2, DBL_MAX))
       break;
   }
 
@@ -960,8 +967,34 @@ std::vector<std::string> TrojanMap::TrojanPath(
  * @return {std::vector<bool> }      : existence of the path
  */
 std::vector<bool> TrojanMap::Queries(const std::vector<std::pair<double, std::vector<std::string>>>& q) {
-    std::vector<bool> ans(q.size());
-    return ans;
+  std::vector<std::pair<double, std::vector<std::string>>> mark;
+  std::vector<bool> res;
+
+  for (auto i:q) {
+    std::string id1 = GetID(i.second[0]);
+    std::string id2 = GetID(i.second[1]);
+
+    // if names are not found
+    if (id1 == "" || id2 == ""){
+      res.push_back(false);
+      continue;
+    }
+
+    std::priority_queue< std::pair<double, std::string>, std::vector< std::pair<double, std::string>>,std::greater<std::pair<double, std::string>>> q;
+    std::unordered_map< std::string, std::pair< bool, std::pair< double, std::string >>> mark;
+    q.push(std::pair<double, std::string>(0, id1));
+    mark.insert(std::pair< std::string, std::pair< bool, std::pair<double, std::string>>>
+              (id1, std::pair< bool, std::pair<double, std::string> >(false, std::pair<double, std::string>(0, "0"))));
+
+    // run Dijkstra Algorithm with tank_capacity limitation
+    while(!q.empty())
+      if (DijkstraFound(q, mark, id2, i.first))
+        break;
+
+    if(q.empty()) res.push_back(false);
+    else res.push_back(true);
+  }
+  return res;
 }
 
 /**

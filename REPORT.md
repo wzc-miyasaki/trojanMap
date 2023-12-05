@@ -198,6 +198,13 @@ Due to the implementation of Dijkstra algorithm and the traversal, the runtime c
 
 
 
+###### 14. Queries
+
+This function is designed based on the idea of Dijkstra algorithm with a limitation of the max distance of the hop. Therefore, I add a parameter as `tank_capacity` to the helper function `DijkstraFound`, and I also set this parameter to be DBL_MAX in the previous simple Dijkstra function.
+
+The overall runtime should be *O*(k×*n*^2), with k being the number of the queries.
+
+
 ### Discussion
 
 The time complexities of different functions vary greatly, from linear or polynomial to potentially exponential in some brute-force approaches. This variation emphasizes how crucial it is to select the appropriate algorithm depending on the type of task. For example, `GetAllCategories` and `FindNearby` are effective for handling big datasets because their complexities scale more linearly with the size of the input data. {TravelingTrojan_Brute_force}, on the other hand, is less scalable for larger input sizes due to its factorial time complexity.

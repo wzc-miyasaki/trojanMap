@@ -2,6 +2,7 @@
 #define TROJAN_MAP_H
 
 #include <math.h>
+#include <float.h>
 
 #include <algorithm>
 #include <cfloat>
@@ -166,7 +167,8 @@ class TrojanMap {
                 std::greater<std::pair<double, std::string>>>& q,
                 std::unordered_map<std::string,
                 std::pair<bool, std::pair< double, std::string >>>& mark,
-                std::string id2);
+                std::string id2,
+                double tank_capacity);
 
 
     void earlyBacktrack(const std::vector<std::string>& location_ids,
