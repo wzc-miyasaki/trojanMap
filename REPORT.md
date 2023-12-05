@@ -1,5 +1,9 @@
 # Trojanmap Project Report
 
+**Team Members**:  Zecheng Wang,  Xinyi Cai
+
+
+
 ### Overview
 
 This trojan map project models a map with several functionalities implemented. The major class `TrojanMap` is designed to handle various map-related tasks such as pathfinding, data retrieval, and analysis within a mapped network of locations (nodes). Here's a high-level overview of the design:
@@ -174,12 +178,22 @@ The std::sort takes O(k log_k) since there're at most k locations needed to be r
 
 
 
-
-
 ### Discussion
 
+The time complexities of different functions vary greatly, from linear or polynomial to potentially exponential in some brute-force approaches. This variation emphasizes how crucial it is to select the appropriate algorithm depending on the type of task. For example, `GetAllCategories` and `FindNearby` are effective for handling big datasets because their complexities scale more linearly with the size of the input data. {TravelingTrojan_Brute_force}, on the other hand, is less scalable for larger input sizes due to its factorial time complexity.
 
+The use of heuristics like 2-opt in TSP and pruning in early backtracking significantly improves performance, especially in complex combinatorial problems. These strategies provide near-optimal solutions more efficiently than exhaustive searches.
+
+The trade-off between performance and accuracy is evident. For example, the 2-opt method for TSP might not always result in the best course of action, even though it offers a quicker solution than brute-force. Therefore, the particular requirements of the task, such as the need for speed versus accuracy, should direct the choice of which algorithms to use.
 
 
 
 ### Conclusion
+
+The project has two main classes: `Node` and `TrojanMap`, and it has an well-organized design. Individual locations are represented by the `Node` class, and the `TrojanMap` functions as the central component, organizing a group of `Node` objects and enabling different map functions. The application's versatility and user-friendly interface are demonstrated by features like pathfinding (Dijkstra, Bellman-Ford), Traveling Salesman Problem (TSP) solutions (brute-force, backtracking, 2-opt heuristic), and utility functions (Autocomplete, GetPosition, etc.).
+
+The time complexity analysis reveals a diverse set of performance metrics across various functions, ranging from efficient linear-time operations such as 'GetAllCategories' and 'FindNearby' to more computationally intensive tasks such as 'TravelingTrojan_Brute_force'. The application's ability to provide near-optimal solutions efficiently is demonstrated by the use of heuristics and optimization techniques, particularly in pathfinding and TSP solutions. The selection of data structures (such as'std::unordered_map' and'std::set') is critical in optimizing the performance of various functions, ensuring fast data retrieval and efficient storage.
+
+There is room for improvement, particularly in functions with high time complexities. To improve scalability and efficiency, advanced algorithms or heuristics could be investigated.
+
+Overall, the TrojanMap project stands out as a solid, user-friendly mapping solution. Its implementation offers valuable insights into the use of data structures and algorithms to solve real-world problems, with plenty of room for future improvements and scalability.
