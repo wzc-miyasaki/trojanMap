@@ -89,7 +89,19 @@ Overal, this funciton has a complexity of *O*(m×n)
 
 ###### 8. CalculateShortestPath_Dijkstra,   CalculateShortestPath_Bellman_Ford
 
+- CalculateShortestPath_Dijkstra
 
+In this function along with its helper function `DijkstraFound`, I implement `q` as a priority_queue to represent the distance table of the source node, and `mark` as an unordered_map to record the visited node.
+
+The helper function `DijkstraFound` serves to updating the distance table and the path until the destination is found. Eventually, backtracking is used to construct the final path.
+
+The overall runtime of this Dijkstra algorithm using array is *O*(*n*^2)
+
+- CalculateShortestPath_Bellman_Ford
+
+This function implement the Bellman_Ford algorithm with 1D table. It employs two unorder_map `distances` and `lasts` for the source node to record the distances and predecessors of each node, and traverses every node to minimize the path until the destination is found.
+
+The overall runtime of this Bellman_Ford algorithm using 1D table is *O*(m×n), which is much higher than Dijkstra's due to large number of edges.
 
 Our Table:
 
@@ -175,6 +187,14 @@ The std::sort takes O(k log_k) since there're at most k locations needed to be r
 
 - If k is small compared to n, then it has a complexity of O(n)
 - If not, then it has a complexity of O(k log_k)
+
+
+
+###### 13. TrojanPath
+
+The idea is using the structure similar to the Brute-force method enhanced with early backtracking. It implements the helper method `TrojanPath_helper`, which recursively using the `CalculateShortestPath_Dijkstra` function to find the shortest distance between visited nodes and unvisited nodes, until the path is completed.
+
+Due to the implementation of Dijkstra algorithm and the traversal, the runtime complexity should be *O*(k!×*n*^2), with k being the number of stops.
 
 
 
