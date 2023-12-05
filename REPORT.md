@@ -1,24 +1,5 @@
 # Trojanmap Project Report
 
-**Requirement**:
-
-- For each menu item, your program should show the time it took to finish each task.
-
-- For shortest path algorithms, you should compare solving the same problem with different algorithms (Dijkstra and Bellman-Ford). Please show the results on at least 3 different examples.
-
-- For the TSP problem, please provide various examples that show the runtime comparison. A table should be provided.
-
-    | Number of Nodes | Time with algorithm_1 |
-    | --------------- | --------------------- |
-    |                 |                       |
-
-- High-level overview of your design (Use diagrams and pictures for your data structures).
-- Detailed description of each function and its time complexity.
-- Time spent for each function.
-- Discussion, conclusion, and lessons learned.
-
-
-
 ### Overview
 
 This trojan map project models a map with several functionalities implemented. The major class `TrojanMap` is designed to handle various map-related tasks such as pathfinding, data retrieval, and analysis within a mapped network of locations (nodes). Here's a high-level overview of the design:
@@ -193,34 +174,12 @@ The std::sort takes O(k log_k) since there're at most k locations needed to be r
 
 
 
-List
 
-- Item 1 (AutoComplete):
-- Item 2-1 (GetPosition): 
 
-- Item 2-2 (EditDistance):
-- Item 3 (GetAllCategories): 3 Points
-- Item 4 (GetAllLocationsFromCategory)
-- Item 5 (GetLocationRegex): 3 Points
-- Item 6 (Shortest path): 15 points.
-    - Bellman-Ford implementation
-    - Dijkstra implementation
-    - Table/Plot for comparison, and measure and report time spent by two algorithms.
-- Item 7 (Cycle detection): 
-    - Boolean value and draw the cycle if there exists one.
-- Item 8 (Topological Sort): 5 points 
-    - Check whether there exist a topological sort or not
-    - Return the correct order and plot those point on the map
+### Discussion
 
-- Item 9 (Traveling Trojan) (Phase 3)
-    - Brute-force: 5 points.
-    - Brute-force enhanced with early backtracking: 5 points.
-    - 2-opt: 5 points.
-    - Animated plot in the report.
-- Item 10 (Find Nearby): 5 points. (Phase 3)
-    - Return the correct nearby results.
-- Item 11 (TrojanPath): 10 points. (Phase 3)
-    - Return the correct ids and draw the points.
-- Item 12 (CheckPath): 10 points. (Phase 3)
-    - Return the correct output.
 
+
+
+
+### Conclusion
