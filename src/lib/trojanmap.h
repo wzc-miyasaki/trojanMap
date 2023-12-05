@@ -138,6 +138,9 @@ class TrojanMap {
       std::vector<std::string> location_ids);
 
   std::vector<std::string> TrojanPath(std::vector<std::string> &location_names);
+
+  void TrojanPath_helper(std::string prev, std::pair<double, std::vector<std::vector<std::string>>> &min,
+  std::pair<double, std::vector<std::vector<std::string>>> &cur, std::unordered_map<std::string, bool> &visited);
     
   // Check whether the id is in square or not
   bool inSquare(std::string id, std::vector<double> &square);

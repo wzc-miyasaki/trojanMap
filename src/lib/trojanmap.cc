@@ -100,6 +100,34 @@ bool dfsCycle(  std::string currId, std::string parentId,
     return false;
 }
 
+void TrojanMap::TrojanPath_helper(std::string prev, std::pair<double, std::vector<std::vector<std::string>>> &min,
+  std::pair<double, std::vector<std::vector<std::string>>> &cur, std::unordered_map<std::string, bool> &visited){
+    //backtracking
+    if(cur.first > min.first)
+      return;
+    //refreshing the min
+    if(cur.second.size() == visited.size() - 1){
+      if(cur.first < min.first)
+        min = cur;
+      return;
+    }
+    for(std::unordered_map<std::string, bool>::iterator iter = visited.begin(); iter != visited.end(); iter++){
+      if(!iter->second)
+      {
+        std::vector<std::string> cur_path =  CalculateShortestPath_Dijkstra(data[prev].name, data[iter->first].name);
+        double cur_length = CalculatePathLength(cur_path);
+        iter->second = true;
+        cur.first += cur_length;
+        cur.second.push_back(cur_path);
+        TrojanPath_helper(iter->first, min, cur, visited);      //control the conditions
+        iter->second = false;
+        cur.first -= cur_length;
+        cur.second.pop_back();
+      }
+    }
+    return;
+}
+
 
 //-----------------------------------------------------
 // TODO: Students should implement the following:
@@ -889,7 +917,39 @@ std::vector<std::string> TrojanMap::FindNearby(std::string attributesName, std::
  */
 std::vector<std::string> TrojanMap::TrojanPath(
       std::vector<std::string> &location_names) {
+  //get the ids
+  std::vector<std::string> location_ids;
+    for(auto name : location_names){
+      std::string id = GetID(name);
+      if (id != ""){
+          location_ids.push_back(id);
+      }
+    }
+
+    std::pair<double, std::vector<std::vector<std::string>>> min;
+    min.first = INT_MAX;
+    std::pair<double, std::vector<std::vector<std::string>>> cur;
+    cur.first = 0;
+    std::unordered_map<std::string, bool> visited;
+
+    for(std::string i : location_ids)
+      visited.insert(std::pair<std::string, bool>(i, false));
+    //start from different points
+    for(std::string i : location_ids){
+      visited[i] = true;
+      TrojanPath_helper(i, min, cur, visited);
+      visited[i] = false;
+    }
+
+    //put the result in the vector
     std::vector<std::string> res;
+    for(int i = 0; i < min.second.size(); i++){
+      for(int j = 0; j < min.second[i].size(); j++){
+        if(j == 0 && i != 0)
+          continue;
+        res.push_back(min.second[i][j]);
+      }
+    }
     return res;
 }
 
