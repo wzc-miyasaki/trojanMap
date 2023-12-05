@@ -568,7 +568,7 @@ TEST(FindNearby, Test2) {
 TEST(FindNearby, Test3) {
   TrojanMap m;
   auto result = m.FindNearby("fast_food", "Leavey Library", 5, 5);
-  std::vector<std::string> ans{"5567733799", "4927493958", "1759017530", "1759017531", "6279600813", "6808450115"};
+  std::vector<std::string> ans{"5567733799", "4927493958", "1759017531", "6279600813", "6808450115"};
   EXPECT_EQ(result, ans);
 }
 
